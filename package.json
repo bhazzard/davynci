@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "main": "main.js",
   "dependencies": {
-    "request": "~2.65.0",
-    "watch": "~0.16.0",
+    "lowdb": "^0.10.2",
+    "pixl-xml": "^1.0.4",
+    "request": "^2.65.0",
+    "underscore": "^1.8.3",
+    "watch": "^0.16.0",
     "yargs": "^3.27.0"
   }
 }

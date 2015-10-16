@@ -1,7 +1,9 @@
 var watch = require('watch'),
     request = require('request'),
     fs = require('fs'),
-    path = require('path');
+    path = require('path'),
+    low = require('lowdb');
+var db = low('db.json');
 
 exports.sync = function(username, password, local, remote) {
   watch.createMonitor(local, {
@@ -44,38 +46,43 @@ exports.sync = function(username, password, local, remote) {
             pass: password
           }
         }, function(error, response, body) {
-          console.log(response.status);
+          console.log(response.headers.etag);
+          db('syncdb').push({ etag: response.headers.etag, href: url});
+          console.log(db('syncdb').find({etag: response.headers.etag}));
         })
       );
   }
 
   function mkdir(f) {
     var filePath = path.relative(local, f);
-    console.log(remote + filePath);
+    var remoteURL = path.join(remote, filePath);
+    console.log(remoteURL);
     request({
       method: 'MKCOL',
-      uri: remote + filePath,
+      uri: remoteURL,
       auth: {
         user: username,
         pass: password
       }
     }, function(error, response, body) {
-      console.log(response.status);
+
     });
   }
 
   function del(f) {
     var filePath = path.relative(local, f);
-    console.log(remote + filePath);
+    var remoteURL = path.join(remote, filePath);
+    console.log(remoteURL);
     request({
       method: 'DELETE',
-      url: remote + filePath,
+      url: remoteURL,
       auth: {
         user: username,
         pass: password
       }
     }, function(error, response, body) {
-      console.log(response.status);
+      db('syncdb').remove({href: url});
+      console.log(db('syncdb').find({href: url}));
     });
   }
 
