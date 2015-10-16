@@ -34,7 +34,7 @@ exports.sync = function(username, password, local, remote) {
 
   function upl(f, stat) {
     var filePath = path.relative(local, f);
-    var remoteURL = path.join(remote, filePath);
+    var remoteURL = remote + filePath;
     console.log(remoteURL);
     fs.createReadStream(f)
       .pipe(
@@ -46,16 +46,20 @@ exports.sync = function(username, password, local, remote) {
             pass: password
           }
         }, function(error, response, body) {
-          console.log(response.headers.etag);
-          db('syncdb').push({ etag: response.headers.etag, href: url});
-          console.log(db('syncdb').find({etag: response.headers.etag}));
+          if (!error) {
+            console.log(response.headers.etag);
+            db('syncdb').push({ etag: response.headers.etag, href: remoteURL});
+            console.log(db('syncdb').find({etag: response.headers.etag}));
+          } else {
+            console.log(error);
+          }
         })
       );
   }
 
   function mkdir(f) {
     var filePath = path.relative(local, f);
-    var remoteURL = path.join(remote, filePath);
+    var remoteURL = remote + filePath;
     console.log(remoteURL);
     request({
       method: 'MKCOL',
@@ -65,13 +69,17 @@ exports.sync = function(username, password, local, remote) {
         pass: password
       }
     }, function(error, response, body) {
-
+      if (!error) {
+        console.log(response.headers);
+      } else {
+        console.log(error);
+      }
     });
   }
 
   function del(f) {
     var filePath = path.relative(local, f);
-    var remoteURL = path.join(remote, filePath);
+    var remoteURL = remote + filePath;
     console.log(remoteURL);
     request({
       method: 'DELETE',
@@ -81,8 +89,12 @@ exports.sync = function(username, password, local, remote) {
         pass: password
       }
     }, function(error, response, body) {
-      db('syncdb').remove({href: url});
-      console.log(db('syncdb').find({href: url}));
+      if (!error) {
+        db('syncdb').remove({href: remoteURL});
+        console.log(db('syncdb').find({href: remoteURL}));
+      } else {
+        console.log(error);
+      }
     });
   }
 
