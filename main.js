@@ -1,6 +1,7 @@
 var app = require('app');
 var BrowserWindow = require('browser-window');
-var configuration = require('./configuration');
+var Configuration = require('./configuration');
+var DAVsync = require('./davsync');
 
 // Report crashes to our server.
 require('crash-reporter').start();
@@ -21,12 +22,17 @@ app.on('window-all-closed', function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
-  configuration.getConfig(function(err, config) {
+  Configuration.getConfig(function(err, config) {
     if (!err) {
       config = JSON.parse(config);
-      console.log(config);
-      if (config.credentials & config.repositories) {
-        //startSyncin(config);
+
+      if (config.credentials && config.repositories) {
+        DAVsync.sync(
+          config.credentials.username,
+          config.credentials.password,
+          config.repositories.local,
+          config.repositories.remote
+        );
       } else {
         loadWizard();
       }
