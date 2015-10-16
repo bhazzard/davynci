@@ -26,7 +26,10 @@ app.on('ready', function() {
     if (!err) {
       config = JSON.parse(config);
 
-      if (config.credentials && config.repositories) {
+      if (config.credentials.username
+        && config.credentials.password
+        && config.repositories.local
+        && config.repositories.remote) {
         DAVsync.sync(
           config.credentials.username,
           config.credentials.password,
@@ -37,7 +40,7 @@ app.on('ready', function() {
         loadWizard();
       }
     } else {
-      console.log(err);
+      loadWizard();
     }
   });
 

@@ -32,18 +32,19 @@ exports.sync = function(username, password, local, remote) {
 
   function upl(f, stat) {
     var filePath = path.relative(local, f);
-    console.log(remote + filePath);
+    var remoteURL = path.join(remote, filePath);
+    console.log(remoteURL);
     fs.createReadStream(f)
       .pipe(
         request({
           method: 'PUT',
-          url: remote + filePath,
+          url: remoteURL,
           auth: {
             user: username,
             pass: password
           }
         }, function(error, response, body) {
-          console.log(response.headers.etag);
+          console.log(response.status);
         })
       );
   }
@@ -59,7 +60,7 @@ exports.sync = function(username, password, local, remote) {
         pass: password
       }
     }, function(error, response, body) {
-      console.log(response.headers.etag);
+      console.log(response.status);
     });
   }
 
@@ -74,7 +75,7 @@ exports.sync = function(username, password, local, remote) {
         pass: password
       }
     }, function(error, response, body) {
-      console.log(response.headers.etag);
+      console.log(response.status);
     });
   }
 

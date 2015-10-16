@@ -4,37 +4,31 @@
     <meta charset="UTF-8">
     <title>Rackspace File Sync</title>
     <style type="text/css">
-      #login {
-        display: none;
-      }
-
-      #choose_local {
-        display: none;
-      }
-
       #success {
         display: none;
       }
     </style>
   </head>
   <body>
-    <div id="login">
-      <h1>Welcome to Davynci!</h1>
-      <p>Davynci is the leading WebDAV desktop sync app.</p>
+    <h1>Welcome to Davynci!</h1>
+    <p>Davynci is the leading WebDAV desktop sync app.</p>
 
+    <div id="login">
       <p>Sign in with your credentials to get started.</p>
       <div>WebDAV Server: <input name="server" /></div>
       <div>Username: <input name="username"/></div>
       <div>Password: <input name="password" type="password"/></div>
-      <div><input id="auth_button" type="submit" value="Start Syncin'"/></div>
     </div>
 
     <div id="choose_local">
-      <h1>Choose local directory</h1>
       <p>Which local directory do you want to sync?</p>
-
-      <div><input id="browse_button" type="submit" value="Browse"/></div>
+      <div>
+        <input id="browse_button" type="submit" value="Browse"/>
+        <div id="selected_local"></div>
+      </div>
     </div>
+
+    <div><input id="go_button" type="submit" value="Start Syncing!"/></div>
 
     <div id="success">
       <h1>Success!</h1>
@@ -45,15 +39,51 @@
 
     <script type="application/javascript">
       var remote = require('remote');
-      var app = remote.require('app'),
-          appPath = app.getAppPath();
-          window.$ = window.jQuery = require(__dirname+'/lib/jquery.js');
+      var dialog = remote.require('dialog');
+      var configuration = remote.require(__dirname + '/configuration');
+      var DAVsync = remote.require(__dirname + '/davsync');
+      var local = false;
 
-      console.log(appPath);
+      window.$ = window.jQuery = require(__dirname+'/lib/jquery.js');
+
+      $('#go_button').click(function() {
+        var server = $('[name=server]').val(),
+            user = $('[name=username]').val(),
+            pass = $('[name=password]').val();
+
+        if (!server || !user || !pass || !local) {
+          alert('error!');
+        } else {
+          configuration.setConfig({
+            "credentials": {
+              "username": user,
+              "password": pass
+            },
+            "repositories": {
+              "local": "" + local + "",
+              "remote": server
+            }
+          }, function(err) {
+            if (!err) {
+              $('#login').hide();
+              $('#choose_local').hide();
+              $('#success').show();
+
+              DAVsync.sync(user, pass, "" + local, server);
+            } else {
+              console.log(err);
+            }
+          });
+        }
+      });
 
       $('#browse_button').click(function() {
-        var dialog = remote.require('dialog');
-        dialog.showOpenDialog({properties: ['openDirectory']});
+        local = dialog.showOpenDialog({properties: ['openDirectory']});
+        $('#selected_local').text(local);
+      });
+
+      $('#close_button').click(function() {
+        window.close();
       });
     </script>
   </body>
