@@ -1,12 +1,13 @@
 var watch = require('watch'),
     request = require('request'),
     fs = require('fs'),
-    path = require('path');
+    path = require('path'),
+    argv = require('yargs').argv;;
 
-var localpath = '/Users/brian.hazzard/Desktop/webdav/',
-    davPath = 'https://brianecross@gmail.com:WebDavTest123@dav.box.com/dav/';
+var localPath = argv.localPath,
+    davUrl = argv.davUrl;
 
-watch.createMonitor('/Users/brian.hazzard/Desktop/webdav/', {
+watch.createMonitor(localPath, {
     'ignoreDotFiles': true,
     'ignoreNotPermitted': true
   }, function (monitor) {
@@ -33,12 +34,12 @@ watch.createMonitor('/Users/brian.hazzard/Desktop/webdav/', {
 });
 
 function upl(f, stat) {
-  var filePath = path.relative(localpath, f);
-  console.log(davPath + filePath);
+  var filePath = path.relative(localPath, f);
+  console.log(davUrl + filePath);
   fs.createReadStream(f)
     .pipe(
       request
-        .put(davPath + filePath)
+        .put(davUrl + filePath)
         .on('response', function(response) {
           console.log(response.statusCode);
         })
@@ -46,21 +47,21 @@ function upl(f, stat) {
 }
 
 function mkdir(f) {
-  var filePath = path.relative(localpath, f);
-  console.log(davPath + filePath);
+  var filePath = path.relative(localPath, f);
+  console.log(davUrl + filePath);
   request({
     method: 'MKCOL',
-    uri: davPath + filePath
+    uri: davUrl + filePath
   }).on('response', function(response) {
     console.log(response.statusCode);
   });
 }
 
 function del(f) {
-  var filePath = path.relative(localpath, f);
-  console.log(davPath + filePath);
+  var filePath = path.relative(localPath, f);
+  console.log(davUrl + filePath);
   request
-    .del(davPath + filePath)
+    .del(davUrl + filePath)
     .on('response', function(response) {
       console.log(response.statusCode);
     });

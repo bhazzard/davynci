@@ -1,9 +1,10 @@
 {
-  "name"    : "davynci",
-  "version" : "0.1.0",
-  "main"    : "main.js",
+  "name": "davynci",
+  "version": "0.1.0",
+  "main": "main.js",
   "dependencies": {
+    "request": "~2.65.0",
     "watch": "~0.16.0",
-    "request": "~2.65.0"
+    "yargs": "^3.27.0"
   }
 }
