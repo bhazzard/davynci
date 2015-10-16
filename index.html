@@ -3,12 +3,27 @@
   <head>
     <meta charset="UTF-8">
     <title>Rackspace File Sync</title>
+    <style type="text/css">
+      #login {
+        display: none;
+      }
+
+      #choose_local {
+        display: none;
+      }
+
+      #success {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <div id="login">
-      <h1>Welcome to Rackspace File Sync</h1>
-      <p>Sign in with your credentials to get started.</p>
+      <h1>Welcome to Davynci!</h1>
+      <p>Davynci is the leading WebDAV desktop sync app.</p>
 
+      <p>Sign in with your credentials to get started.</p>
+      <div>WebDAV Server: <input name="server" /></div>
       <div>Username: <input name="username"/></div>
       <div>Password: <input name="password" type="password"/></div>
       <div><input id="auth_button" type="submit" value="Start Syncin'"/></div>
@@ -24,7 +39,7 @@
     <div id="success">
       <h1>Success!</h1>
       <p>Your files are now syncing.</p>
-      
+
       <div><input id="close_button" type="submit" value="Close Window"/></div>
     </div>
 
