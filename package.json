@@ -1,5 +1,9 @@
 {
-  "name"    : "your-app",
+  "name"    : "davynci",
   "version" : "0.1.0",
-  "main"    : "main.js"
+  "main"    : "main.js",
+  "dependencies": {
+    "watch": "~0.16.0",
+    "request": "~2.65.0"
+  }
 }
