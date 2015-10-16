@@ -44,9 +44,15 @@
     </div>
 
     <script type="application/javascript">
-      window.$ = window.jQuery = require(__dirname+'/lib/jquery.js');
+      var remote = require('remote');
+      var app = remote.require('app'),
+          appPath = app.getAppPath();
+          window.$ = window.jQuery = require(__dirname+'/lib/jquery.js');
+
+      console.log(appPath);
+
       $('#browse_button').click(function() {
-        var dialog = require('dialog');
+        var dialog = remote.require('dialog');
         dialog.showOpenDialog({properties: ['openDirectory']});
       });
     </script>

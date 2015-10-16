@@ -1,0 +1,10 @@
+{
+  "credentials": {
+    "username": "brianecross@gmail.com",
+    "password": "WebDavTest123"
+  },
+  "repositories": {
+    "local": "/Users/brian.hazzard/Desktop/webdav/",
+    "remote": "https://dav.box.com/dav/"
+  }
+}
