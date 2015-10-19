@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Rackspace File Sync</title>
+    <title>Davynci File Sync</title>
     <style type="text/css">
       #success {
         display: none;
@@ -10,25 +10,20 @@
     </style>
   </head>
   <body>
-    <h1>Welcome to Davynci!</h1>
-    <p>Davynci is the leading WebDAV desktop sync app.</p>
-
-    <div id="login">
+    <div id="setup">
+      <h1>Welcome to Davynci!</h1>
+      <p>Davynci is the leading WebDAV desktop sync app.</p>
       <p>Sign in with your credentials to get started.</p>
       <div>WebDAV Server: <input name="server" /></div>
       <div>Username: <input name="username"/></div>
       <div>Password: <input name="password" type="password"/></div>
-    </div>
-
-    <div id="choose_local">
-      <p>Which local directory do you want to sync?</p>
       <div>
+        Local Directory: <input name="local"/>
         <input id="browse_button" type="submit" value="Browse"/>
-        <div id="selected_local"></div>
       </div>
-    </div>
 
-    <div><input id="go_button" type="submit" value="Start Syncing!"/></div>
+      <div><input id="go_button" type="submit" value="Start Syncing!"/></div>
+    </div>
 
     <div id="success">
       <h1>Success!</h1>
@@ -42,14 +37,15 @@
       var dialog = remote.require('dialog');
       var configuration = remote.require(__dirname + '/configuration');
       var DAVsync = remote.require(__dirname + '/davsync');
-      var local = false;
+      var SyncTray = remote.require(__dirname + '/synctray');
 
       window.$ = window.jQuery = require(__dirname+'/lib/jquery.js');
 
       $('#go_button').click(function() {
         var server = $('[name=server]').val(),
             user = $('[name=username]').val(),
-            pass = $('[name=password]').val();
+            pass = $('[name=password]').val(),
+            local = $('[name=local]').val();
 
         if (!server || !user || !pass || !local) {
           alert('error!');
@@ -65,8 +61,7 @@
             }
           }, function(err) {
             if (!err) {
-              $('#login').hide();
-              $('#choose_local').hide();
+              $('#setup').hide();
               $('#success').show();
 
               DAVsync.sync(user, pass, "" + local, server);
@@ -78,12 +73,19 @@
       });
 
       $('#browse_button').click(function() {
-        local = dialog.showOpenDialog({properties: ['openDirectory']});
-        $('#selected_local').text(local);
+        var path = dialog.showOpenDialog({properties: ['openDirectory']});
+        $('[name=local]').val(path);
       });
 
       $('#close_button').click(function() {
         window.close();
+      });
+
+      require('ipc').on('config', function(config) {
+        $('[name=server]').val(config.repositories.remote);
+        $('[name=username]').val(config.credentials.username);
+        $('[name=password]').val(config.credentials.password);
+        $('[name=local]').val(config.repositories.local);
       });
     </script>
   </body>

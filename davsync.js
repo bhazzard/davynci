@@ -30,6 +30,12 @@ exports.sync = function(username, password, local, remote) {
       del(f);
       console.log('file removed: ' + f);
     });
+
+    return (function() {
+      this.stop = function() {
+        monitor.stop();
+      }
+    })();
   });
 
   function upl(f, stat) {
