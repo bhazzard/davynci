@@ -12,7 +12,7 @@ exports.load = function(config) {
 
 function createWindow() {
   var mainWindow = new BrowserWindow({width: 800, height: 600});
-  mainWindow.openDevTools();
+  //mainWindow.openDevTools();
   mainWindow.loadUrl('file://' + __dirname + '/index.html');
   return mainWindow;
 }

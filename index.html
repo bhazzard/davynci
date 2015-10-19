@@ -3,7 +3,12 @@
   <head>
     <meta charset="UTF-8">
     <title>Davynci File Sync</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
     <style type="text/css">
+      body {
+        padding: 5em;
+      }
+
       #success {
         display: none;
       }
@@ -12,32 +17,51 @@
   <body>
     <div id="setup">
       <h1>Welcome to Davynci!</h1>
-      <p>Davynci is the leading WebDAV desktop sync app.</p>
       <p>Sign in with your credentials to get started.</p>
-      <div>WebDAV Server: <input name="server" /></div>
-      <div>Username: <input name="username"/></div>
-      <div>Password: <input name="password" type="password"/></div>
-      <div>
-        Local Directory: <input name="local"/>
-        <input id="browse_button" type="submit" value="Browse"/>
-      </div>
 
-      <div><input id="go_button" type="submit" value="Start Syncing!"/></div>
+      <form class="pure-form pure-form-aligned">
+        <fieldset>
+          <div class="pure-control-group">
+            <label for="server">WebDAV Server</label>
+            <input name="server" type="text" class="pure-input-1-2" placeholder="WebDAV Server"/>
+          </div>
+
+          <div class="pure-control-group">
+            <label for="username">WebDAV Username</label>
+            <input name="username" type="text" class="pure-input-1-2" placeholder="WebDAV Username"/>
+          </div>
+
+          <div class="pure-control-group">
+            <label for="password">WebDAV Password</label>
+            <input name="password" type="password" class="pure-input-1-2" placeholder="WebDAV Password"/>
+          </div>
+
+          <div class="pure-control-group">
+            <label for="local">Local Directory</label>
+            <input name="local" type="text" class="pure-input-1-2" placeholder="Local Directory"/>
+            <button id="browse_button" class="pure-button">Browse</button>
+          </div>
+
+          <button id="go_button" class="pure-button pure-button-primary pure-input-1">
+            Start Syncing!
+          </button>
+        </fieldset>
+      </form>
     </div>
 
     <div id="success">
       <h1>Success!</h1>
       <p>Your files are now syncing.</p>
 
-      <div><input id="close_button" type="submit" value="Close Window"/></div>
+      <button id="close_button" class="pure-button pure-button-primary">
+        Close Window
+      </button>
     </div>
 
     <script type="application/javascript">
       var remote = require('remote');
+      var ipc = require('ipc');
       var dialog = remote.require('dialog');
-      var configuration = remote.require(__dirname + '/configuration');
-      var DAVsync = remote.require(__dirname + '/davsync');
-      var SyncTray = remote.require(__dirname + '/synctray');
 
       window.$ = window.jQuery = require(__dirname+'/lib/jquery.js');
 
@@ -50,7 +74,7 @@
         if (!server || !user || !pass || !local) {
           alert('error!');
         } else {
-          configuration.setConfig({
+          var config = {
             "credentials": {
               "username": user,
               "password": pass
@@ -59,29 +83,27 @@
               "local": "" + local + "",
               "remote": server
             }
-          }, function(err) {
-            if (!err) {
-              $('#setup').hide();
-              $('#success').show();
+          };
 
-              DAVsync.sync(user, pass, "" + local, server);
-            } else {
-              console.log(err);
-            }
-          });
+          $('#setup').hide();
+          $('#success').show();
+          ipc.send('config.changed', config);
         }
+        return false;
       });
 
       $('#browse_button').click(function() {
         var path = dialog.showOpenDialog({properties: ['openDirectory']});
         $('[name=local]').val(path);
+        return false;
       });
 
       $('#close_button').click(function() {
         window.close();
+        return false;
       });
 
-      require('ipc').on('config', function(config) {
+      ipc.on('config', function(config) {
         $('[name=server]').val(config.repositories.remote);
         $('[name=username]').val(config.credentials.username);
         $('[name=password]').val(config.credentials.password);

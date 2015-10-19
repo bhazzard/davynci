@@ -3,6 +3,7 @@ var Configuration = require('./configuration');
 var DAVsync = require('./davsync');
 var SyncTray = require('./synctray');
 var Wizard = require('./wizard');
+var ipc = require('ipc');
 
 // Report crashes to our server.
 require('crash-reporter').start();
@@ -35,11 +36,26 @@ app.on('ready', function() {
   });
 });
 
+var sync = undefined;
 function startSync(config) {
-  DAVsync.sync(
+  sync = DAVsync.sync(
     config.credentials.username,
     config.credentials.password,
     config.repositories.local,
     config.repositories.remote
   );
 }
+
+function setConfig(config) {
+  Configuration.setConfig(config, function(err) {
+    if (err) {
+      console.log(err);
+    }
+  });
+}
+
+ipc.on('config.changed', function(event, config) {
+  console.log('config.changed to ', config);
+  setConfig(config);
+  startSync(config);
+});

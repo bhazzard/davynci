@@ -5,11 +5,19 @@ var watch = require('watch'),
     low = require('lowdb');
 var db = low('db.json');
 
+var previousMonitor = false;
 exports.sync = function(username, password, local, remote) {
+  if (previousMonitor) {
+    previousMonitor.stop();
+    console.log('DAVsync stopped.');
+  }
+
   watch.createMonitor(local, {
       'ignoreDotFiles': true,
       'ignoreNotPermitted': true
     }, function (monitor) {
+    previousMonitor = monitor;
+
     monitor.on("created", function (f, stat) {
       if(stat.isFile()) {
         upl(f);
@@ -31,11 +39,7 @@ exports.sync = function(username, password, local, remote) {
       console.log('file removed: ' + f);
     });
 
-    return (function() {
-      this.stop = function() {
-        monitor.stop();
-      }
-    })();
+    console.log('DAVsync started.');
   });
 
   function upl(f, stat) {
