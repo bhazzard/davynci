@@ -4,10 +4,12 @@ var Wizard = require('./wizard');
 var ipc = require('ipc');
 
 var configuration = false;
+var tray = null;
+
 exports.createTray = function(config) {
   configuration = config;
 
-  var tray = new Tray(__dirname + '/assets/tray.png');
+  tray = new Tray(__dirname + '/assets/tray.png');
   var contextMenu = Menu.buildFromTemplate([
     {
       label: 'Options',
